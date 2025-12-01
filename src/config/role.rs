@@ -203,6 +203,10 @@ impl Role {
         &self.prompt
     }
 
+    pub fn set_prompt(&mut self, p: String) {
+        self.prompt = p;
+    }
+    
     pub fn is_empty_prompt(&self) -> bool {
         self.prompt.is_empty()
     }

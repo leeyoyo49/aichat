@@ -2,12 +2,14 @@ mod agent;
 mod input;
 mod role;
 mod session;
+pub mod environments;
 
 pub use self::agent::{complete_agent_variables, list_agents, Agent, AgentVariables};
 pub use self::input::Input;
 pub use self::role::{
     Role, RoleLike, CODE_ROLE, CREATE_TITLE_ROLE, EXPLAIN_SHELL_ROLE, SHELL_ROLE,
 };
+pub use environments::EnvProfile;
 use self::session::Session;
 
 use crate::client::{
@@ -524,7 +526,10 @@ impl Config {
     }
 
     pub fn extract_role(&self) -> Role {
-        if let Some(session) = self.session.as_ref() {
+        // =====================================
+        // 先取得基礎 role（session/agent/role/default）
+        // =====================================
+        let mut role = if let Some(session) = self.session.as_ref() {
             session.to_role()
         } else if let Some(agent) = self.agent.as_ref() {
             agent.to_role()
@@ -539,7 +544,18 @@ impl Config {
                 self.use_tools.clone(),
             );
             role
-        }
+        };
+    
+        // ===============================
+        // 加入使用者環境 context
+        // ===============================
+        let env = EnvProfile::detect();
+        let env_ctx = env.to_prompt_context();
+    
+        let new_prompt = format!("{}\n\n{}", env_ctx, role.prompt());
+        role.set_prompt(new_prompt); 
+    
+        role
     }
 
     pub fn info(&self) -> Result<String> {
@@ -2042,6 +2058,12 @@ impl Config {
             output.insert("color.white", "\u{1b}[37m".to_string());
             output.insert("color.light_gray", "\u{1b}[97m".to_string());
         }
+
+        // Inject environment info for template use
+        let env = EnvProfile::detect();
+        output.insert("os", env.os.to_string());
+        output.insert("shell", env.shell.to_string());
+        output.insert("package_manager", env.pkg.to_string());
 
         output
     }
