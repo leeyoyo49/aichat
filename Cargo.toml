@@ -70,10 +70,12 @@ terminal-colorsaurus = "0.4.8"
 duct = "1.0.0"
 sysinfo = "0.37.2"
 ping = "0.7.0"
+ureq = "^2.9"
+yoke = "0.8.1"
 
 [dependencies.reqwest]
 version = "0.12.0"
-features = ["json", "multipart", "socks", "rustls-tls", "rustls-tls-native-roots"]
+features = ["json", "multipart", "socks", "rustls-tls", "rustls-tls-native-roots", "blocking"]
 default-features = false
 
 [dependencies.syntect]
