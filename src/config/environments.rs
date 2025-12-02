@@ -1,7 +1,6 @@
 use serde::{Deserialize, Serialize};
 use std::env;
 use sysinfo::{System, Disks}; 
-// 記得先執行 `cargo add sysinfo`
 
 /// ================================
 ///  Enum 定義

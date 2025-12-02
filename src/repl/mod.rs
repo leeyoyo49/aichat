@@ -5,6 +5,7 @@ mod prompt;
 use self::completer::ReplCompleter;
 use self::highlighter::ReplHighlighter;
 use self::prompt::ReplPrompt;
+use crate::render::{MarkdownRender, RenderOptions};
 
 use crate::client::{call_chat_completions, call_chat_completions_streaming};
 use crate::config::{
@@ -31,7 +32,7 @@ use std::{env, process};
 
 const MENU_NAME: &str = "completion_menu";
 
-static REPL_COMMANDS: LazyLock<[ReplCommand; 36]> = LazyLock::new(|| {
+static REPL_COMMANDS: LazyLock<[ReplCommand; 37]> = LazyLock::new(|| {
     [
         ReplCommand::new(".help", "Show this help guide", AssertState::pass()),
         ReplCommand::new(".info", "Show system info", AssertState::pass()),
@@ -184,6 +185,7 @@ static REPL_COMMANDS: LazyLock<[ReplCommand; 36]> = LazyLock::new(|| {
             AssertState::pass(),
         ),
         ReplCommand::new(".exit", "Exit REPL", AssertState::pass()),
+        ReplCommand::new(".export", "Export current session as markdown file", AssertState::pass()),
     ]
 });
 static COMMAND_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"^\s*(\.\S*)\s*").unwrap());
@@ -672,7 +674,10 @@ pub async fn run_repl_command(
                     None => bail!("No chat response to copy"),
                 };
                 set_text(&output).context("Failed to copy the last chat response")?;
-            }
+            },
+            ".export" => {
+                export_session_markdown(config, args)?;
+            },
             ".exit" => match args {
                 Some("role") => {
                     config.write().exit_role()?;
@@ -945,4 +950,36 @@ mod tests {
             (vec![".\\file.txt".into(), "C:\\dir\\file.txt".into()], "")
         );
     }
+}
+
+fn export_session_markdown(config: &GlobalConfig, args: Option<&str>) -> Result<()> {
+    // Fix: Create a longer-lived binding to avoid temporary value issue
+    let config_guard = config.read();
+    let session = match config_guard.session.as_ref() {
+        Some(s) => s,
+        None => {
+            println!("No active session.");
+            return Ok(());
+        }
+    };
+
+    // output filename
+    let filename = match args {
+        Some(name) if !name.trim().is_empty() => name.trim().to_string(),
+        _ => format!("session-{}.md", session.name()),
+    };
+
+    // Initialize renderer with default theme + settings
+    let mut renderer = MarkdownRender::init(RenderOptions::default())?;
+
+    // Use the built-in session.render() to generate markdown
+    let md = session.render(&mut renderer, &None)?;
+    
+    // Drop the guard before writing to file
+    drop(config_guard);
+    
+    std::fs::write(&filename, md)?;
+    println!("✓ Exported session to {}", filename);
+
+    Ok(())
 }

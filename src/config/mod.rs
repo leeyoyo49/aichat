@@ -2064,6 +2064,13 @@ impl Config {
         output.insert("os", env.os.to_string());
         output.insert("shell", env.shell.to_string());
         output.insert("package_manager", env.pkg.to_string());
+        output.insert("cpu_cores", env.cpu_cores.to_string());
+        output.insert("cpu_usage", env.cpu_usage.to_string());
+        output.insert("memory_total_gb", env.memory_total_gb.to_string());
+        output.insert("memory_used_gb", env.memory_used_gb.to_string());
+        output.insert("disk_total_gb", env.disk_total_gb.to_string());
+        output.insert("disk_available_gb", env.disk_available_gb.to_string());
+        output.insert("gpu_name", env.gpu_name.clone().unwrap_or_else(|| "Unknown".to_string()));   
 
         output
     }
