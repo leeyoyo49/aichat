@@ -260,7 +260,7 @@ async fn shell_execute(
         return Ok(());
     }
     if *IS_STDOUT_TERMINAL {
-        let options = ["execute", "revise", "describe", "copy", "quit"];
+        let options = ["preview", "execute", "revise", "tutor", "copy", "quit"];
         let command = color_text(eval_str.trim(), nu_ansi_term::Color::Rgb(255, 165, 0));
         let first_letter_color = nu_ansi_term::Color::Cyan;
         let prompt_text = options
@@ -271,12 +271,51 @@ async fn shell_execute(
         loop {
             println!("{command}");
             let answer_char =
-                read_single_key(&['e', 'r', 'd', 'c', 'q'], 'e', &format!("{prompt_text}: "))?;
+                read_single_key(&['p', 'e', 'r', 't', 'c', 'q'], 'e', &format!("{prompt_text}: "))?;
 
             match answer_char {
+                'p' => {
+                    // Preview command impact
+                    if let Err(e) = preview_command_impact(&eval_str) {
+                        eprintln!("Preview error: {}", e);
+                    }
+                    continue;
+                }
                 'e' => {
+                    // Create backup before execution if needed
+                    let backup_manager = BackupManager::new()?;
+                    let file_paths = extract_file_paths_from_command(&eval_str);
+
+                    let mut backup_id = None;
+                    if !file_paths.is_empty() {
+                        match backup_manager.create_backup(&eval_str, file_paths) {
+                            Ok(backup) => {
+                                println!("{}", dimmed_text(&format!("✓ Backup created: {}", backup.id)));
+                                backup_id = Some(backup.id);
+                            }
+                            Err(e) => {
+                                eprintln!("{}", dimmed_text(&format!("⚠ Backup failed: {}", e)));
+                                println!("{}", dimmed_text("Continue anyway? [y/N]"));
+                                let mut response = String::new();
+                                std::io::stdin().read_line(&mut response)?;
+                                if !response.trim().eq_ignore_ascii_case("y") {
+                                    println!("{}", dimmed_text("Execution cancelled."));
+                                    continue;
+                                }
+                            }
+                        }
+                    }
+
                     debug!("{} {:?}", shell.cmd, &[&shell.arg, &eval_str]);
                     let code = run_command(&shell.cmd, &[&shell.arg, &eval_str], None)?;
+
+                    if code != 0 && backup_id.is_some() {
+                        println!("\n{}", dimmed_text(&format!(
+                            "⚠ Command failed! To restore backup, run: .backup restore {}",
+                            backup_id.unwrap()
+                        )));
+                    }
+
                     if code == 0 && config.read().save_shell_history {
                         let _ = append_to_shell_history(&shell.name, &eval_str, code);
                     }
@@ -288,25 +327,10 @@ async fn shell_execute(
                     input.set_text(text);
                     return shell_execute(config, shell, input, abort_signal.clone()).await;
                 }
-                'd' => {
-                    let role = config.read().retrieve_role(EXPLAIN_SHELL_ROLE)?;
-                    let input = Input::from_str(config, &eval_str, Some(role));
-                    if input.stream() {
-                        call_chat_completions_streaming(
-                            &input,
-                            client.as_ref(),
-                            abort_signal.clone(),
-                        )
-                        .await?;
-                    } else {
-                        call_chat_completions(
-                            &input,
-                            true,
-                            false,
-                            client.as_ref(),
-                            abort_signal.clone(),
-                        )
-                        .await?;
+                't' => {
+                    // Command Tutor Mode - enhanced describe
+                    if let Err(e) = show_command_tutorial(&eval_str, config) {
+                        eprintln!("Tutorial error: {}", e);
                     }
                     println!();
                     continue;

@@ -33,5 +33,12 @@
 .DS_Store
 Thumbs.db
 
+# Internal documentation (for development only)
+CLAUDE_WORK_LOG.md
+WORK_SUMMARY.md
+TESTING_GUIDE.md
+QUICKSTART_TESTING.md
+FEATURE3_IMPLEMENTATION_PLAN.md
+
 # Session exports (optional)
 # session-*.md

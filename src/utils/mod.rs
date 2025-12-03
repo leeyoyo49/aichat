@@ -1,6 +1,9 @@
 mod abort_signal;
+mod backup;
 mod clipboard;
 mod command;
+mod command_analyzer;
+mod command_tutor;
 mod crypto;
 mod html_to_md;
 mod input;
@@ -12,8 +15,11 @@ mod spinner;
 mod variables;
 
 pub use self::abort_signal::*;
+pub use self::backup::*;
 pub use self::clipboard::set_text;
 pub use self::command::*;
+pub use self::command_analyzer::*;
+pub use self::command_tutor::*;
 pub use self::crypto::*;
 pub use self::html_to_md::*;
 pub use self::input::*;

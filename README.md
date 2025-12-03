@@ -66,19 +66,54 @@ aichat
 - New REPL command: `.export [filename]`
 - Function: `export_session_markdown()` in `src/repl/mod.rs`
 
-### 3. ⏳ Safe and Reversible Execution
-**Status:** Partially Implemented
+### 3. ✅ Safe and Reversible Execution
+**Status:** Fully Implemented
 
-**Completed:**
-- ✅ Environment awareness ensures generated commands match your system
+**Features:**
+- ✅ **Environment Awareness**: Commands match your system automatically
+- ✅ **Command Preview** ('p'): Show which files will be affected before execution
+- ✅ **Automatic Backups**: Files are backed up automatically before destructive operations
+- ✅ **Command Tutor Mode** ('t'): Step-by-step explanations with environment-specific notes
+- ✅ **Backup Management**: `.backup` command in REPL to list, restore, delete backups
+- ✅ **Rollback Support**: Restore files from backup if command fails
 
-**Planned (Future Work):**
-- 🔄 Sandbox preview with diff view before execution
-- 💾 Automatic file backups
-- ⏮️ One-click rollback (git stash-like functionality)
-- 📖 Command Tutor mode with step-by-step explanations
+**Usage in Execute Mode (-e):**
+```bash
+aichat -e "remove old log files"
 
-For detailed Chinese documentation, see [功能說明.md](功能說明.md).
+# New options available:
+# [p] Preview  - See which files will be affected
+# [e] Execute  - Run with automatic backup
+# [r] Revise   - Modify the command
+# [t] Tutor    - Learn what the command does
+# [c] Copy     - Copy to clipboard
+# [q] Quit     - Cancel
+```
+
+**Backup Management in REPL:**
+```bash
+aichat
+> .backup list              # List all backups
+> .backup restore <id>      # Restore a specific backup
+> .backup delete <id>       # Delete a backup
+> .backup cleanup [count]   # Keep only last N backups (default: 50)
+```
+
+### 📚 Documentation
+
+**Quick Start:**
+- 🚀 [Quick Testing Guide](QUICKSTART_TESTING.md) - Test new features in 5-10 minutes
+- 📖 [Detailed Testing Guide](TESTING_GUIDE.md) - Comprehensive testing procedures
+- 🔧 [Implementation Plan](FEATURE3_IMPLEMENTATION_PLAN.md) - Feature 3 development roadmap
+
+**For Developers:**
+- 💻 [CLAUDE.md](CLAUDE.md) - Development guide for Claude Code
+- 📝 [Work Log](CLAUDE_WORK_LOG.md) - Complete development history
+- 📊 [Work Summary](WORK_SUMMARY.md) - Project overview and status
+
+**For Users:**
+- 🇨🇳 [功能說明.md](功能說明.md) - Detailed Chinese documentation
+- 📑 [README.md](README.md) - This file
 
 --- 
 

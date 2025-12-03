@@ -186,6 +186,7 @@ static REPL_COMMANDS: LazyLock<[ReplCommand; 37]> = LazyLock::new(|| {
         ),
         ReplCommand::new(".exit", "Exit REPL", AssertState::pass()),
         ReplCommand::new(".export", "Export current session as markdown file", AssertState::pass()),
+        ReplCommand::new(".backup", "Manage command execution backups", AssertState::pass()),
     ]
 });
 static COMMAND_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"^\s*(\.\S*)\s*").unwrap());
@@ -678,6 +679,9 @@ pub async fn run_repl_command(
             ".export" => {
                 export_session_markdown(config, args)?;
             },
+            ".backup" => {
+                handle_backup_command(config, args)?;
+            },
             ".exit" => match args {
                 Some("role") => {
                     config.write().exit_role()?;
@@ -974,12 +978,74 @@ fn export_session_markdown(config: &GlobalConfig, args: Option<&str>) -> Result<
 
     // Use the built-in session.render() to generate markdown
     let md = session.render(&mut renderer, &None)?;
-    
+
     // Drop the guard before writing to file
     drop(config_guard);
-    
+
     std::fs::write(&filename, md)?;
     println!("✓ Exported session to {}", filename);
+
+    Ok(())
+}
+
+fn handle_backup_command(_config: &GlobalConfig, args: Option<&str>) -> Result<()> {
+    let backup_manager = BackupManager::new()?;
+
+    let (subcommand, rest) = match args {
+        Some(a) => {
+            let parts: Vec<&str> = a.splitn(2, ' ').collect();
+            (parts.get(0).copied(), parts.get(1).copied())
+        }
+        None => (None, None),
+    };
+
+    match subcommand {
+        Some("list") | None => {
+            // List all backups
+            let backups = backup_manager.list_backups()?;
+            if backups.is_empty() {
+                println!("No backups found.");
+                return Ok(());
+            }
+
+            println!("\n{}", "=".repeat(80));
+            println!("📦 Backup History");
+            println!("{}", "=".repeat(80));
+
+            for (i, backup) in backups.iter().enumerate() {
+                println!("\n[{}] ID: {}", i + 1, backup.id);
+                println!("    Time: {}", backup.timestamp);
+                println!("    Command: {}", backup.command);
+                println!("    Files: {} backed up", backup.files.len());
+                for file in &backup.files {
+                    println!("      - {}", file.original_path.display());
+                }
+            }
+            println!("\n{}", "=".repeat(80));
+            println!("Usage: .backup restore <id> | .backup delete <id> | .backup cleanup [count]");
+        }
+
+        Some("restore") => {
+            let backup_id = rest.ok_or_else(|| anyhow!("Please specify backup ID"))?;
+            backup_manager.restore_backup(backup_id)?;
+        }
+
+        Some("delete") => {
+            let backup_id = rest.ok_or_else(|| anyhow!("Please specify backup ID"))?;
+            backup_manager.delete_backup(backup_id)?;
+        }
+
+        Some("cleanup") => {
+            let keep_count = rest
+                .and_then(|s| s.parse::<usize>().ok())
+                .unwrap_or(50);
+            backup_manager.cleanup_old_backups(keep_count)?;
+        }
+
+        Some(cmd) => {
+            bail!("Unknown backup subcommand: {}. Use: list, restore, delete, or cleanup", cmd);
+        }
+    }
 
     Ok(())
 }
