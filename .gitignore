@@ -2,3 +2,36 @@
 /tmp
 /.env
 *.log
+
+# LaTeX auxiliary files
+*.aux
+*.out
+*.toc
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+
+# Large files and screenshots (keep proposals)
+*.png
+*.jpg
+*.jpeg
+*.gif
+!LSAP_final_proposal.pdf
+
+# API keys and secrets
+*.key
+*credentials.json
+
+# Editor and IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Session exports (optional)
+# session-*.md

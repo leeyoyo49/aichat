@@ -1,0 +1,110 @@
+# Makefile for compiling LaTeX documents
+# 用於編譯 AIChat 功能介紹 LaTeX 文件
+
+# 變數定義
+LATEX = xelatex
+BIBTEX = bibtex
+DOCUMENT = AICHAT_功能介紹
+TEX_FILE = $(DOCUMENT).tex
+PDF_FILE = $(DOCUMENT).pdf
+
+# 輔助檔案
+AUX_FILES = *.aux *.log *.out *.toc *.lof *.lot *.bbl *.blg *.idx *.ind *.ilg *.fls *.fdb_latexmk *.synctex.gz
+
+# 預設目標
+.PHONY: all
+all: $(PDF_FILE)
+
+# 編譯 PDF
+$(PDF_FILE): $(TEX_FILE)
+	@echo "正在編譯 LaTeX 文件..."
+	$(LATEX) $(TEX_FILE)
+	@echo "第二次編譯以生成目錄..."
+	$(LATEX) $(TEX_FILE)
+	@echo "編譯完成! PDF 檔案: $(PDF_FILE)"
+
+# 完整編譯(包括參考文獻)
+.PHONY: full
+full: $(TEX_FILE)
+	@echo "完整編譯(包括參考文獻)..."
+	$(LATEX) $(TEX_FILE)
+	$(BIBTEX) $(DOCUMENT)
+	$(LATEX) $(TEX_FILE)
+	$(LATEX) $(TEX_FILE)
+	@echo "完整編譯完成!"
+
+# 快速編譯(只編譯一次)
+.PHONY: quick
+quick: $(TEX_FILE)
+	@echo "快速編譯..."
+	$(LATEX) $(TEX_FILE)
+	@echo "快速編譯完成!"
+
+# 清理輔助檔案
+.PHONY: clean
+clean:
+	@echo "清理輔助檔案..."
+	rm -f $(AUX_FILES)
+	@echo "清理完成!"
+
+# 完全清理(包括 PDF)
+.PHONY: distclean
+distclean: clean
+	@echo "清理 PDF 檔案..."
+	rm -f $(PDF_FILE)
+	@echo "完全清理完成!"
+
+# 開啟 PDF
+.PHONY: view
+view: $(PDF_FILE)
+	@echo "開啟 PDF..."
+	@if [ -f $(PDF_FILE) ]; then \
+		if command -v open >/dev/null 2>&1; then \
+			open $(PDF_FILE); \
+		elif command -v xdg-open >/dev/null 2>&1; then \
+			xdg-open $(PDF_FILE); \
+		elif command -v evince >/dev/null 2>&1; then \
+			evince $(PDF_FILE) & \
+		else \
+			echo "找不到 PDF 檢視器"; \
+		fi \
+	else \
+		echo "PDF 檔案不存在,請先編譯"; \
+	fi
+
+# 編譯並開啟
+.PHONY: show
+show: all view
+
+# 持續編譯(監控檔案變更)
+.PHONY: watch
+watch:
+	@echo "監控檔案變更並自動編譯..."
+	@while true; do \
+		make quick; \
+		sleep 2; \
+	done
+
+# 顯示幫助
+.PHONY: help
+help:
+	@echo "可用的 make 指令:"
+	@echo "  make          - 編譯 PDF (預設)"
+	@echo "  make all      - 編譯 PDF"
+	@echo "  make quick    - 快速編譯(單次)"
+	@echo "  make full     - 完整編譯(含參考文獻)"
+	@echo "  make clean    - 清理輔助檔案"
+	@echo "  make distclean- 完全清理(含 PDF)"
+	@echo "  make view     - 開啟 PDF"
+	@echo "  make show     - 編譯並開啟 PDF"
+	@echo "  make watch    - 監控並自動編譯"
+	@echo "  make help     - 顯示此幫助"
+
+# 檢查依賴
+.PHONY: check
+check:
+	@echo "檢查編譯環境..."
+	@command -v $(LATEX) >/dev/null 2>&1 || { echo "錯誤: 找不到 $(LATEX)"; exit 1; }
+	@echo "✓ $(LATEX) 已安裝"
+	@command -v $(BIBTEX) >/dev/null 2>&1 && echo "✓ $(BIBTEX) 已安裝" || echo "⚠ $(BIBTEX) 未安裝(可選)"
+	@echo "環境檢查完成!"

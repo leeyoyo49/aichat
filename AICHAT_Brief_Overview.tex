@@ -1,0 +1,67 @@
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{enumitem}
+
+\geometry{left=2.5cm,right=2.5cm,top=3cm,bottom=3cm}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    urlcolor=cyan,
+}
+
+\title{\textbf{AIChat: All-in-one LLM CLI Tool}}
+\author{AIChat Development Team}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\noindent
+\textbf{AIChat} is a comprehensive command-line interface (CLI) tool for interacting with Large Language Models (LLMs), written in Rust. It provides a unified interface to seamlessly integrate over 20 leading LLM service providers, including OpenAI, Claude, Gemini, and Ollama. The tool is designed for developers, researchers, and power users who require efficient AI assistance directly from their terminal environment.
+
+\vspace{0.3cm}
+
+\noindent
+The primary strength of AIChat lies in its versatility and extensibility. Users can access multiple AI models through a single, consistent interface without switching between different tools or platforms. The application supports three distinct working modes: CMD mode for quick one-shot queries, REPL mode for interactive conversations, and Server mode for deploying local API endpoints. This flexibility makes it suitable for various workflows, from rapid prototyping to production deployments.
+
+\vspace{0.3cm}
+
+\noindent
+AIChat excels in several key areas. Its \textbf{Shell Assistant} feature translates natural language into executable shell commands, automatically adapting to the user's operating system and shell environment. The \textbf{Session Management} system maintains conversation history and context across multiple interactions, with intelligent compression when token limits are approached. The built-in \textbf{RAG (Retrieval-Augmented Generation)} capability allows users to query their own document libraries, combining LLM reasoning with specific domain knowledge. Additionally, \textbf{Function Calling} support enables LLMs to interact with external tools and APIs, while the \textbf{AI Agent} system orchestrates complex multi-step workflows.
+
+\vspace{0.3cm}
+
+\noindent
+The tool's architecture emphasizes performance and reliability. Written in Rust, AIChat provides fast execution with minimal resource overhead. It supports rich input methods including local files, directories, remote URLs, and standard input streams. Users can customize AI behavior through a comprehensive \textbf{Role System}, defining specialized prompts and configurations for different use cases such as code review, translation, or technical writing. The \textbf{Macro System} allows combining frequently-used command sequences into reusable shortcuts.
+
+\vspace{0.3cm}
+
+\noindent
+From a practical standpoint, AIChat addresses common challenges in AI-assisted development. It handles multimodal inputs, processing text, code, images, and documents through appropriate vision or parsing tools. The session compression feature automatically summarizes long conversations to stay within model token limits while preserving context. Security is built-in with support for environment variable-based API key management and configurable tool access restrictions. Cross-platform compatibility ensures consistent behavior across macOS, Linux, Windows, and even Android Termux environments.
+
+\vspace{0.3cm}
+
+\noindent
+The configuration system is straightforward yet powerful. A single YAML file controls all aspects of behavior, from model selection and temperature settings to RAG parameters and custom themes. Users can define multiple client configurations to work with different providers simultaneously, each with its own API keys, base URLs, and model specifications. The tool automatically handles streaming responses, syntax highlighting, and markdown rendering for an enhanced terminal experience.
+
+\vspace{0.3cm}
+
+\noindent
+AIChat is actively maintained as an open-source project under MIT/Apache-2.0 dual licensing. It can be installed via multiple package managers including Cargo, Homebrew, and system package repositories. The project maintains comprehensive documentation through its GitHub Wiki, with an active Discord community for support and discussion. Version 0.30.0 represents a mature, production-ready tool with a stable API and extensive feature set.
+
+\vspace{0.3cm}
+
+\noindent
+The following sections detail the technical architecture, core functionalities, and practical applications of AIChat, providing both conceptual understanding and concrete usage examples.
+
+\section{Project Overview}
+
+% Your existing content continues here...
+
+\end{document}

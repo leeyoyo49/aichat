@@ -1,0 +1,962 @@
+\documentclass[12pt,a4paper]{article}
+
+% Package imports
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{geometry}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{tcolorbox}
+\usepackage{tikz}
+\usepackage{fontawesome5}
+\usepackage{multicol}
+\usepackage{fancyhdr}
+
+% Page settings
+\geometry{left=2.5cm,right=2.5cm,top=3cm,bottom=3cm}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\textit{AIChat Feature Overview}}
+\fancyhead[R]{\thepage}
+\fancyfoot[C]{\textit{All-in-one LLM CLI Tool}}
+
+% Hyperlink settings
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,
+    urlcolor=cyan,
+    pdftitle={AIChat Feature Overview},
+    pdfauthor={AIChat Team},
+}
+
+% Code listing settings
+\lstset{
+    basicstyle=\ttfamily\small,
+    backgroundcolor=\color{gray!10},
+    frame=single,
+    breaklines=true,
+    columns=flexible,
+    keywordstyle=\color{blue},
+    commentstyle=\color{green!60!black},
+    stringstyle=\color{red},
+    showstringspaces=false,
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+}
+
+% Custom colors
+\definecolor{titlecolor}{RGB}{0,102,204}
+\definecolor{sectioncolor}{RGB}{51,102,153}
+\definecolor{highlightcolor}{RGB}{255,204,0}
+
+% Custom boxes
+\tcbuselibrary{skins,breakable}
+\newtcolorbox{featurebox}[1]{
+    colback=blue!5!white,
+    colframe=blue!75!black,
+    fonttitle=\bfseries,
+    title=#1,
+    breakable,
+    enhanced,
+}
+
+\newtcolorbox{commandbox}[1]{
+    colback=green!5!white,
+    colframe=green!75!black,
+    fonttitle=\bfseries,
+    title=#1,
+    breakable,
+}
+
+\newtcolorbox{notebox}{
+    colback=yellow!5!white,
+    colframe=orange!75!black,
+    fonttitle=\bfseries,
+    title=\faInfoCircle\ Note,
+}
+
+% Title information
+\title{
+    \Huge\textbf{\textcolor{titlecolor}{AIChat}} \\
+    \Large All-in-one LLM CLI Tool \\
+    \large Feature Overview \& Technical Documentation
+}
+\author{
+    \textit{AIChat Development Team} \\
+    \small \url{https://github.com/sigoden/aichat}
+}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{empty}
+
+\begin{center}
+    \large
+    \textbf{Version:} 0.30.0 \quad
+    \textbf{License:} MIT / Apache-2.0 \\
+    \textbf{Language:} Rust \quad
+    \textbf{Platforms:} macOS, Linux, Windows, Android
+\end{center}
+
+\vspace{1cm}
+
+\begin{abstract}
+    \noindent
+    AIChat is a comprehensive AI assistant command-line tool developed in Rust, providing a unified interface to integrate over 20 leading Large Language Model (LLM) service providers. This document presents a detailed overview of AIChat's core features, architectural design, usage patterns, and practical applications, aiming to help users maximize AI interaction potential in command-line environments.
+\end{abstract}
+
+\newpage
+\tableofcontents
+\newpage
+
+\section{Project Overview}
+
+AIChat is a powerful and flexible LLM CLI tool designed to provide developers and advanced users with efficient and convenient AI interaction experiences.
+
+\subsection{Core Features}
+
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Multi-Provider Integration:} Support for 20+ LLM providers including OpenAI, Claude, Gemini, Ollama
+    \item \textbf{Flexible Working Modes:} Three distinct modes - CMD, REPL, and Server
+    \item \textbf{Shell Assistant:} Natural language to shell command conversion
+    \item \textbf{Rich Input Methods:} Support for files, directories, URLs, STDIN, and more
+    \item \textbf{Session Management:} Complete conversation context preservation and management
+    \item \textbf{RAG Support:} Retrieval-Augmented Generation with external documents
+    \item \textbf{Function Calling:} Tool integration and automation capabilities
+    \item \textbf{AI Agents:} Complex task automation and workflow execution
+\end{itemize}
+
+\subsection{Technical Architecture}
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{ll}
+        \toprule
+        \textbf{Component} & \textbf{Technology} \\
+        \midrule
+        Core Language & Rust 2021 Edition \\
+        CLI Framework & Clap 4.4 \\
+        Async Runtime & Tokio 1.34 \\
+        HTTP Client & Reqwest 0.12 \\
+        Serialization & Serde, Serde JSON, Serde YAML \\
+        Vector Search & HNSW, BM25 \\
+        Terminal UI & Crossterm, Reedline \\
+        Syntax Highlighting & Syntect \\
+        \bottomrule
+    \end{tabular}
+    \caption{AIChat Technology Stack}
+\end{table}
+
+\subsection{Key Statistics}
+
+\begin{itemize}
+    \item \textbf{Source Files:} 48 Rust files
+    \item \textbf{Model Definitions:} 2,275 lines in models.yaml
+    \item \textbf{Supported Providers:} 20+ LLM services
+    \item \textbf{REPL Commands:} 36 built-in commands
+    \item \textbf{Installation Methods:} 6 package managers
+\end{itemize}
+
+\section{Core Functionality}
+
+\subsection{Multi-Provider LLM Support}
+
+AIChat integrates industry-leading LLM service providers through a unified interface.
+
+\begin{featurebox}{Supported LLM Providers}
+    \begin{multicols}{3}
+        \begin{itemize}[nosep]
+            \item OpenAI
+            \item Anthropic Claude
+            \item Google Gemini
+            \item Azure OpenAI
+            \item Google VertexAI
+            \item AWS Bedrock
+            \item Ollama
+            \item Groq
+            \item Mistral AI
+            \item Deepseek
+            \item Cohere
+            \item Perplexity
+            \item Cloudflare
+            \item OpenRouter
+            \item XAI Grok
+            \item AI21 Labs
+            \item Alibaba Qianwen
+            \item Zhipu AI
+            \item Moonshot
+            \item Baidu Ernie
+            \item MiniMax
+            \item Custom APIs
+        \end{itemize}
+    \end{multicols}
+\end{featurebox}
+
+\subsubsection{Configuration Example}
+
+\begin{lstlisting}[language=yaml,caption={Multi-Provider Configuration}]
+clients:
+  # OpenAI
+  - type: openai
+    api_key: sk-xxx
+    api_base: https://api.openai.com/v1
+
+  # Anthropic Claude
+  - type: claude
+    api_key: sk-ant-xxx
+
+  # Local Ollama
+  - type: openai-compatible
+    name: ollama
+    api_base: http://localhost:11434/v1
+    models:
+      - name: llama3.1
+        max_input_tokens: 128000
+        supports_function_calling: true
+\end{lstlisting}
+
+\subsection{Three Working Modes}
+
+\subsubsection{CMD Mode (Command-Line Mode)}
+
+Ideal for quick queries and script integration with single-shot conversations.
+
+\begin{commandbox}{CMD Mode Examples}
+\begin{lstlisting}[language=bash]
+# Basic usage
+aichat "Explain recursion"
+
+# Specify model
+aichat -m gpt-4o "Write a quicksort algorithm"
+
+# Include files
+aichat -f main.py "Review this code"
+
+# From standard input
+cat error.log | aichat "Analyze this error"
+
+# Execute shell commands
+aichat -e "Find files larger than 100MB"
+\end{lstlisting}
+\end{commandbox}
+
+\subsubsection{REPL Mode (Interactive Dialog)}
+
+Provides rich interactive features suitable for extended usage sessions.
+
+\begin{featurebox}{REPL Mode Features}
+    \begin{enumerate}[leftmargin=*]
+        \item \textbf{Tab Completion:} Auto-complete commands, file paths, model names
+        \item \textbf{Multi-line Input:} Support for complex multi-line questions and code
+        \item \textbf{History Search:} Ctrl+R to search command history
+        \item \textbf{Syntax Highlighting:} Markdown and code block highlighting
+        \item \textbf{Custom Keybindings:} Support for Emacs and Vi keybinding styles
+        \item \textbf{Rich Commands:} 36+ built-in REPL commands
+    \end{enumerate}
+\end{featurebox}
+
+\begin{commandbox}{Common REPL Commands}
+\begin{lstlisting}[language=bash]
+.help              # Show help guide
+.model gpt-4o      # Switch model
+.role code         # Switch role
+.session my-proj   # Start session
+.file data.txt     # Load file
+.info session      # Show session info
+.copy              # Copy last response
+.exit              # Exit REPL
+\end{lstlisting}
+\end{commandbox}
+
+\subsubsection{Serve Mode (Server Mode)}
+
+Launch a local HTTP server providing API services and web interfaces.
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{lp{8cm}}
+        \toprule
+        \textbf{Service} & \textbf{Description} \\
+        \midrule
+        Chat Completions & OpenAI-compatible conversation API \\
+        Embeddings & Text vectorization service \\
+        Rerank & Document re-ranking service \\
+        LLM Playground & Web-based chat interface \\
+        LLM Arena & Side-by-side model comparison tool \\
+        \bottomrule
+    \end{tabular}
+    \caption{Services Provided by Serve Mode}
+\end{table}
+
+\begin{lstlisting}[language=bash,caption={Starting the Server}]
+# Use default address
+aichat --serve
+
+# Specify address and port
+aichat --serve 0.0.0.0:3000
+
+# Access services
+# http://127.0.0.1:8000/v1/chat/completions
+# http://127.0.0.1:8000/playground
+# http://127.0.0.1:8000/arena?num=2
+\end{lstlisting}
+
+\subsection{Shell Assistant}
+
+Convert natural language to shell commands, boosting command-line productivity.
+
+\begin{featurebox}{Shell Assistant Features}
+    \begin{itemize}
+        \item \textbf{Auto-Adaptation:} Detects OS (Linux/macOS/Windows)
+        \item \textbf{Shell Compatibility:} Supports bash, zsh, fish, PowerShell
+        \item \textbf{Safe Execution:} Shows command for confirmation by default, requires -e flag to execute
+        \item \textbf{Context-Aware:} Understands current working directory and environment
+    \end{itemize}
+\end{featurebox}
+
+\begin{commandbox}{Shell Assistant Examples}
+\begin{lstlisting}[language=bash]
+# Generate command (don't execute)
+aichat -c "List all files larger than 100MB"
+
+# Generate and execute
+aichat -e "Find top 5 processes by CPU usage"
+
+# Complex operations
+aichat -e "Convert all jpg to png and compress"
+
+# Git operations
+aichat -c "Create and checkout a new branch"
+\end{lstlisting}
+\end{commandbox}
+
+\subsection{Multi-Form Input Support}
+
+AIChat supports seven flexible input methods that can be combined.
+
+\begin{table}[h]
+    \centering
+    \small
+    \begin{tabular}{lp{6cm}l}
+        \toprule
+        \textbf{Input Type} & \textbf{CMD Mode} & \textbf{REPL Mode} \\
+        \midrule
+        CLI Arguments & \texttt{aichat "question"} & Direct input \\
+        STDIN & \texttt{cat file | aichat} & - \\
+        Local Files & \texttt{-f file.txt} & \texttt{.file file.txt} \\
+        Local Directories & \texttt{-f dir/} & \texttt{.file dir/} \\
+        Remote URLs & \texttt{-f https://...} & \texttt{.file https://...} \\
+        External Commands & \texttt{-f '\`cmd\`'} & \texttt{.file \`cmd\`} \\
+        Combined Inputs & \texttt{-f a -f b text} & \texttt{.file a b -- text} \\
+        \bottomrule
+    \end{tabular}
+    \caption{Input Methods Comparison}
+\end{table}
+
+\begin{notebox}
+    \textbf{Supported File Formats:}
+    Text files, code files, PDF (requires pdftotext), DOCX (requires pandoc),
+    images (requires Vision model), web pages (auto-converts to Markdown)
+\end{notebox}
+
+\subsection{Role System}
+
+Customize AI behavior patterns and domain expertise.
+
+\subsubsection{Role Definition}
+
+\begin{lstlisting}[language=yaml,caption={Role Configuration Example: translator.yaml}]
+name: translator
+description: Professional English-Chinese translator
+
+prompt: |
+  You are a professional English-Chinese translator
+  specializing in technical documentation.
+
+  Translation rules:
+  - Maintain accuracy of technical terms
+  - Keep code blocks untranslated
+  - Natural and fluent tone
+  - Preserve original formatting
+
+model: gpt-4o
+temperature: 0.3
+top_p: 0.9
+\end{lstlisting}
+
+\subsubsection{Built-in Roles}
+
+\begin{itemize}
+    \item \texttt{\%shell\%} - Shell command generation expert
+    \item \texttt{\%explain-shell\%} - Shell command explanation expert
+    \item \texttt{\%code\%} - Programming expert
+\end{itemize}
+
+\subsection{Session System}
+
+Maintain continuous conversation context for long-term memory.
+
+\begin{featurebox}{Session Features}
+    \begin{enumerate}
+        \item \textbf{Persistent Storage:} All conversations saved in YAML format
+        \item \textbf{Context Preservation:} Remembers all conversation history
+        \item \textbf{Auto-Compression:} Automatic compression when token limit exceeded
+        \item \textbf{Flexible Management:} Create, save, load, delete sessions
+        \item \textbf{Editable:} Support for manual session file editing
+    \end{enumerate}
+\end{featurebox}
+
+\begin{commandbox}{Session Management Commands}
+\begin{lstlisting}[language=bash]
+# CLI commands
+aichat -s my-project              # Start session
+aichat --list-sessions            # List all sessions
+aichat -s proj --save-session     # Force save
+
+# REPL commands
+.session my-project               # Switch session
+.info session                     # Show detailed info
+.save session                     # Save session
+.compress session                 # Compress history
+.empty session                    # Clear messages
+.exit session                     # Exit session
+\end{lstlisting}
+\end{commandbox}
+
+\subsubsection{Session Configuration}
+
+\begin{lstlisting}[language=yaml,caption={Session-Related Configuration}]
+# Auto-save control
+save_session: null  # true/false/null(ask)
+
+# Compression threshold (token count)
+compress_threshold: 4000
+
+# Summary prompt
+summarize_prompt: 'Summarize the discussion briefly
+                   in 200 words or less'
+
+# Summary prefix
+summary_prompt: 'This is a summary of chat history: '
+\end{lstlisting}
+
+\subsection{RAG (Retrieval-Augmented Generation)}
+
+Integrate external documents to answer questions based on your knowledge base.
+
+\subsubsection{RAG Architecture}
+
+\begin{center}
+\begin{tikzpicture}[
+    node distance=1.5cm,
+    box/.style={rectangle, draw, fill=blue!20, text width=3cm, text centered, rounded corners, minimum height=1cm},
+    arrow/.style={->, >=stealth, thick}
+]
+    \node[box] (doc) {Document Library};
+    \node[box, below of=doc] (chunk) {Document Chunking};
+    \node[box, below of=chunk] (embed) {Vector Embedding};
+    \node[box, below of=embed] (index) {Vector Index (HNSW)};
+    \node[box, right=3cm of index] (query) {User Query};
+    \node[box, below of=query] (retrieve) {Retrieve Documents};
+    \node[box, below of=retrieve] (rerank) {Rerank (Optional)};
+    \node[box, below of=rerank] (llm) {LLM Generation};
+
+    \draw[arrow] (doc) -- (chunk);
+    \draw[arrow] (chunk) -- (embed);
+    \draw[arrow] (embed) -- (index);
+    \draw[arrow] (query) -- (retrieve);
+    \draw[arrow] (index) -- (retrieve);
+    \draw[arrow] (retrieve) -- (rerank);
+    \draw[arrow] (rerank) -- (llm);
+\end{tikzpicture}
+\end{center}
+
+\subsubsection{RAG Configuration}
+
+\begin{lstlisting}[language=yaml,caption={RAG Configuration}]
+# Embedding model
+rag_embedding_model: openai:text-embedding-3-small
+
+# Reranker model (improves accuracy)
+rag_reranker_model: cohere:rerank-english-v3.0
+
+# Number of documents to retrieve
+rag_top_k: 5
+
+# Chunk size (characters)
+rag_chunk_size: 1000
+
+# Chunk overlap
+rag_chunk_overlap: 200
+
+# Document loaders
+document_loaders:
+  pdf: 'pdftotext $1 -'
+  docx: 'pandoc --to plain $1'
+\end{lstlisting}
+
+\subsubsection{Usage Examples}
+
+\begin{lstlisting}[language=bash,caption={RAG Usage}]
+# Create RAG
+aichat --rag my-docs
+
+# Add documents in REPL
+> .rag add /path/to/docs
+> .rag add https://docs.example.com
+
+# Query with RAG
+aichat --rag my-docs "How to deploy this project?"
+
+# Rebuild RAG
+aichat --rag my-docs --rebuild-rag
+\end{lstlisting}
+
+\subsection{Function Calling}
+
+Connect to external tools and data sources, greatly extending AI capabilities.
+
+\subsubsection{Concepts and Capabilities}
+
+Function Calling enables LLMs to:
+
+\begin{itemize}
+    \item Call external tools and APIs
+    \item Access real-time data
+    \item Execute system operations
+    \item Integrate third-party services
+\end{itemize}
+
+\subsubsection{Tool Configuration}
+
+\begin{lstlisting}[language=yaml,caption={Function Calling Configuration}]
+# Global enable
+function_calling: true
+
+# Tool mappings (aliases)
+mapping_tools:
+  fs: 'fs_cat,fs_ls,fs_mkdir,fs_rm,fs_write'
+  web: 'web_search,web_fetch'
+
+# Default tools to use
+use_tools: 'fs,web'
+\end{lstlisting}
+
+\subsubsection{Built-in Tools}
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{lp{8cm}}
+        \toprule
+        \textbf{Category} & \textbf{Tools} \\
+        \midrule
+        File System & fs\_cat, fs\_ls, fs\_mkdir, fs\_rm, fs\_write \\
+        Web & web\_search, web\_fetch, web\_scrape \\
+        System & execute\_command, get\_env \\
+        \bottomrule
+    \end{tabular}
+    \caption{Built-in Tool Categories}
+\end{table}
+
+\subsection{AI Agents}
+
+AI Agent = Instructions (Prompt) + Tools + Documents (RAG)
+
+\begin{featurebox}{Agent Structure}
+    \begin{verbatim}
+~/.config/aichat/agents/
+└── my-agent/
+    ├── config.yaml          # Agent config
+    ├── instructions.md      # Instructions
+    └── documents/           # Document library (optional)
+    \end{verbatim}
+\end{featurebox}
+
+\subsubsection{Agent Configuration Example}
+
+\begin{lstlisting}[language=yaml,caption={code-reviewer Agent Configuration}]
+name: code-reviewer
+model: claude:claude-3-5-sonnet
+temperature: 0.3
+use_tools: 'fs,git'
+agent_prelude: temp
+
+instructions: |
+  You are a professional code review expert.
+
+  Review focus:
+  1. Code quality and readability
+  2. Potential bugs and security issues
+  3. Performance optimization suggestions
+  4. Best practices adherence
+
+  Output format:
+  - Overall score (1-10)
+  - List of main issues
+  - Improvement suggestions
+  - Summary of strengths
+
+variables:
+  language: python
+  style_guide: pep8
+\end{lstlisting}
+
+\subsubsection{Using Agents}
+
+\begin{lstlisting}[language=bash,caption={Agent Usage Examples}]
+# List all agents
+aichat --list-agents
+
+# Start agent
+aichat -a code-reviewer
+
+# Specify variables
+aichat -a code-reviewer --agent-variable language rust
+
+# Load files
+aichat -a code-reviewer -f main.rs "Review this file"
+\end{lstlisting}
+
+\subsection{Macro System}
+
+Combine frequently used command sequences into reusable macros.
+
+\subsubsection{Macro Definition}
+
+\begin{lstlisting}[caption={translate.macro}]
+# Translation macro
+.role translator
+.file $1
+Translate to English
+\end{lstlisting}
+
+\begin{lstlisting}[caption={review.macro}]
+# Code review macro
+.agent code-reviewer
+.file $1
+Review this code, focusing on:
+1. Security
+2. Performance
+3. Maintainability
+\end{lstlisting}
+
+\subsubsection{Using Macros}
+
+\begin{lstlisting}[language=bash]
+# Execute macro
+aichat --macro translate document.txt
+aichat --macro review src/main.rs
+
+# List all macros
+aichat --list-macros
+\end{lstlisting}
+
+\section{Advanced Features}
+
+\subsection{Custom Themes}
+
+Support for custom dark and light themes.
+
+\begin{lstlisting}[language=yaml,caption={Custom Theme Example}]
+name: my-dark-theme
+light: false
+
+colors:
+  background: "#1e1e1e"
+  foreground: "#d4d4d4"
+  keyword: "#569cd6"
+  string: "#ce9178"
+  comment: "#6a9955"
+  function: "#dcdcaa"
+  variable: "#9cdcfe"
+  prompt: "#00ff00"
+  error: "#f44747"
+  warning: "#ff8800"
+\end{lstlisting}
+
+\subsection{Custom REPL Prompts}
+
+\begin{lstlisting}[language=yaml,caption={Prompt Configuration}]
+# Left prompt
+left_prompt: |
+  {color.green}{?session {session}>}{role}{color.cyan}>{color.reset}
+
+# Right prompt
+right_prompt: |
+  {color.purple}{consume_tokens}({consume_percent}%){color.reset}
+\end{lstlisting}
+
+\textbf{Available Variables:}
+\texttt{\{role\}}, \texttt{\{session\}}, \texttt{\{agent\}}, \texttt{\{rag\}},
+\texttt{\{model\}}, \texttt{\{consume\_tokens\}}, \texttt{\{consume\_percent\}}
+
+\section{Practical Use Cases}
+
+\subsection{Daily Development}
+
+\begin{lstlisting}[language=bash]
+# Quick queries
+aichat "How to handle errors in Rust?"
+
+# Code review
+aichat -f main.rs "What are the issues in this code?"
+
+# Generate tests
+aichat -r code -f src/lib.rs "Write unit tests"
+
+# Git operations
+aichat -e "Commit all changes and push"
+\end{lstlisting}
+
+\subsection{Learning New Technologies}
+
+\begin{lstlisting}[language=bash]
+# Start learning session
+aichat -s rust-learning
+
+> Explain Rust's ownership mechanism
+> Give me an example
+> How is this different from C++'s RAII?
+> (Continue learning with context preserved)
+\end{lstlisting}
+
+\subsection{Technical Documentation Q\&A}
+
+\begin{lstlisting}[language=bash]
+# Create document library
+aichat --rag project-docs
+> .rag add docs/ README.md
+
+# Query
+aichat --rag project-docs "What is the deployment process?"
+\end{lstlisting}
+
+\subsection{Task Automation}
+
+\begin{lstlisting}[language=bash]
+# Use agent
+aichat -a data-processor -f data.csv "Clean data and generate report"
+
+# Use macro
+aichat --macro daily-report
+\end{lstlisting}
+
+\section{Performance and Optimization}
+
+\subsection{Model Selection Strategy}
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{lll}
+        \toprule
+        \textbf{Need} & \textbf{Recommended Model} & \textbf{Characteristics} \\
+        \midrule
+        Fast Response & GPT-4o-mini & Fast, low cost \\
+        Balanced & GPT-4o & Quality/speed balance \\
+        Best Quality & Claude-3.5-Sonnet & High-quality output \\
+        Local Deployment & Ollama/LLaMA & Privacy protection \\
+        Long Context & Claude-3 & 200K context \\
+        \bottomrule
+    \end{tabular}
+    \caption{Model Selection Recommendations}
+\end{table}
+
+\subsection{Token Optimization}
+
+\begin{itemize}
+    \item Enable session compression: \texttt{compress\_threshold: 3000}
+    \item Limit output length: \texttt{max\_tokens: 2000}
+    \item Use models with larger context to reduce compression frequency
+\end{itemize}
+
+\subsection{Local Model Deployment}
+
+\begin{lstlisting}[language=yaml]
+# Using Ollama
+clients:
+  - type: openai-compatible
+    name: ollama
+    api_base: http://localhost:11434/v1
+
+model: ollama:llama3.1
+\end{lstlisting}
+
+\section{Security Considerations}
+
+\subsection{API Key Management}
+
+\begin{lstlisting}[language=bash]
+# Method 1: Use environment variables
+export OPENAI_API_KEY=sk-xxx
+export ANTHROPIC_API_KEY=sk-ant-xxx
+
+# Method 2: Config file permissions
+chmod 600 ~/.config/aichat/config.yaml
+\end{lstlisting}
+
+\subsection{Sensitive Data Protection}
+
+\begin{lstlisting}[language=yaml]
+# Don't save sensitive sessions
+save_session: false
+\end{lstlisting}
+
+\begin{lstlisting}[language=bash]
+# Use temporary session
+aichat -s temp "Handle sensitive data"
+\end{lstlisting}
+
+\subsection{Tool Permission Restrictions}
+
+\begin{lstlisting}[language=yaml]
+# Restrict tool usage
+use_tools: 'fs_read,web_search'  # Only allow read and search
+\end{lstlisting}
+
+\section{Installation and Deployment}
+
+\subsection{Installation Methods}
+
+\begin{commandbox}{Package Manager Installation}
+\begin{lstlisting}[language=bash]
+# Rust developers
+cargo install aichat
+
+# Homebrew (macOS/Linux)
+brew install aichat
+
+# Arch Linux
+pacman -S aichat
+
+# Windows Scoop
+scoop install aichat
+
+# Android Termux
+pkg install aichat
+\end{lstlisting}
+\end{commandbox}
+
+\subsection{Configuration File Structure}
+
+\begin{verbatim}
+~/.config/aichat/
+├── config.yaml              # Main configuration
+├── roles/                   # Role definitions
+│   ├── coder.yaml
+│   └── translator.yaml
+├── agents/                  # Agent definitions
+│   ├── researcher/
+│   └── analyst/
+├── macros/                  # Macro files
+│   ├── translate.macro
+│   └── review.macro
+├── functions/               # Function definitions
+│   └── tools.json
+├── themes/                  # Custom themes
+│   └── my-theme.yaml
+├── sessions/                # Session storage
+│   ├── project-a.yaml
+│   └── project-b.yaml
+└── rags/                    # RAG document libraries
+    └── my-docs/
+\end{verbatim}
+
+\section{Troubleshooting}
+
+\subsection{Common Issues}
+
+\begin{enumerate}
+    \item \textbf{Cannot Connect to API}
+    \begin{lstlisting}[language=bash]
+# Check proxy settings
+export HTTPS_PROXY=http://127.0.0.1:7890
+# Test connection
+aichat --info
+    \end{lstlisting}
+
+    \item \textbf{Token Limit Exceeded}
+    \begin{lstlisting}[language=yaml]
+# Enable compression
+compress_threshold: 3000
+# Or use model with larger context
+model: claude:claude-3-5-sonnet  # 200K context
+    \end{lstlisting}
+
+    \item \textbf{Encoding Issues}
+    \begin{lstlisting}[language=bash]
+# Set locale
+export LANG=en_US.UTF-8
+    \end{lstlisting}
+
+    \item \textbf{RAG Creation Failed}
+    \begin{lstlisting}[language=bash]
+# Check document loaders
+pdftotext -v
+pandoc --version
+    \end{lstlisting}
+\end{enumerate}
+
+\section{Community and Contributing}
+
+\subsection{Resources}
+
+\begin{itemize}
+    \item \textbf{GitHub:} \url{https://github.com/sigoden/aichat}
+    \item \textbf{Discord:} \url{https://discord.gg/mr3ZZUB9hG}
+    \item \textbf{Wiki:} \url{https://github.com/sigoden/aichat/wiki}
+    \item \textbf{Issue Tracker:} \url{https://github.com/sigoden/aichat/issues}
+\end{itemize}
+
+\subsection{Contributing Guidelines}
+
+We welcome contributions to AIChat:
+
+\begin{enumerate}
+    \item Fork the repository
+    \item Create a feature branch
+    \item Write tests
+    \item Submit a Pull Request
+    \item Follow Rust coding conventions
+\end{enumerate}
+
+\section{Conclusion}
+
+AIChat, as an all-in-one LLM CLI tool, offers the following advantages:
+
+\begin{itemize}[leftmargin=*]
+    \item[$\checkmark$] \textbf{Unified Interface:} Single access point for 20+ LLM providers
+    \item[$\checkmark$] \textbf{Flexible Modes:} CMD/REPL/Serve for different needs
+    \item[$\checkmark$] \textbf{Powerful Features:} Sessions, RAG, Function Calling, Agents
+    \item[$\checkmark$] \textbf{High Performance:} Written in Rust for fast execution
+    \item[$\checkmark$] \textbf{Highly Extensible:} Rich configuration and customization options
+    \item[$\checkmark$] \textbf{Cross-Platform:} Support for major operating systems
+    \item[$\checkmark$] \textbf{Active Community:} Continuous updates and maintenance
+\end{itemize}
+
+\vspace{0.5cm}
+
+Whether you are a developer, researcher, or advanced user, AIChat can significantly enhance your AI interaction efficiency. Start using it today to experience powerful AI capabilities in the command-line environment!
+
+\vspace{1cm}
+
+\begin{center}
+    \Large
+    \textbf{Version Information} \\
+    \vspace{0.3cm}
+    \normalsize
+    Current Version: 0.30.0 \\
+    Documentation Updated: \today \\
+    \vspace{0.3cm}
+    \small
+    \textit{Copyright © 2023-2025 AIChat Developers} \\
+    \textit{Licensed under MIT OR Apache-2.0}
+\end{center}
+
+\end{document}

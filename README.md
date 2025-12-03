@@ -4,7 +4,83 @@
 [![Crates](https://img.shields.io/crates/v/aichat.svg)](https://crates.io/crates/aichat)
 [![Discord](https://img.shields.io/discord/1226737085453701222?label=Discord)](https://discord.gg/mr3ZZUB9hG)
 
-AIChat is an all-in-one LLM CLI tool featuring Shell Assistant, CMD & REPL Mode, RAG, AI Tools & Agents, and More. 
+AIChat is an all-in-one LLM CLI tool featuring Shell Assistant, CMD & REPL Mode, RAG, AI Tools & Agents, and More.
+
+> **Note**: This is a fork for LASP Final Project (Group 12) with additional features. See [New Features](#new-features-lasp-final-project) below.
+
+## 🆕 New Features (LASP Final Project)
+
+This fork adds three major enhancements to improve safety, environment awareness, and collaboration:
+
+### 1. ✅ Environment Auto-Detection (Auto-Setup)
+**Status:** Fully Implemented
+
+AIChat now automatically detects and adapts to your system environment, ensuring all AI-generated commands match your OS and toolchain.
+
+**Features:**
+- 🖥️ **OS Detection**: Automatically identifies macOS, Linux, Windows, WSL
+- 🐚 **Shell Detection**: Supports Bash, Zsh, Fish, PowerShell, Cmd
+- 📦 **Package Manager Detection**: Recognizes Brew, Apt, Pacman, Nix, Choco, Scoop, Winget
+- 💻 **System Info**: Collects CPU cores, memory, disk space, GPU model
+- 🤖 **AI Context Injection**: Environment info is automatically injected into prompts
+
+**Example:**
+```bash
+# On macOS
+aichat -c "install Python"
+# AI suggests: brew install python
+
+# On Ubuntu (same command)
+aichat -c "install Python"
+# AI suggests: sudo apt install python3
+```
+
+**Implementation:**
+- New module: `src/config/environments.rs`
+- Environment context injected into all role prompts in XML format
+- View detected environment with `.info` command
+
+### 2. ✅ Session Export to Markdown
+**Status:** Fully Implemented
+
+Export REPL conversation sessions as formatted Markdown files for sharing, archiving, or coursework submission.
+
+**Features:**
+- 📄 **Complete Conversation Log**: Preserves all prompts and responses
+- 🎨 **Markdown Formatting**: Automatic code block formatting and syntax highlighting
+- 💾 **Custom Filenames**: Support for custom output filenames
+- 📊 **Metadata Included**: Preserves session name and configuration
+
+**Usage:**
+```bash
+# Start REPL and create a session
+aichat
+> .session my-project
+> Write a sorting algorithm
+> Explain time complexity
+> .export                    # Export to session-my-project.md
+> .export custom-name.md     # Export with custom filename
+```
+
+**Implementation:**
+- New REPL command: `.export [filename]`
+- Function: `export_session_markdown()` in `src/repl/mod.rs`
+
+### 3. ⏳ Safe and Reversible Execution
+**Status:** Partially Implemented
+
+**Completed:**
+- ✅ Environment awareness ensures generated commands match your system
+
+**Planned (Future Work):**
+- 🔄 Sandbox preview with diff view before execution
+- 💾 Automatic file backups
+- ⏮️ One-click rollback (git stash-like functionality)
+- 📖 Command Tutor mode with step-by-step explanations
+
+For detailed Chinese documentation, see [功能說明.md](功能說明.md).
+
+--- 
 
 ## Install
 

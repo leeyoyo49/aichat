@@ -1,0 +1,210 @@
+\section{Feature Overview}
+
+\noindent
+\textbf{Repository:} \url{https://github.com/sigoden/aichat} \\
+\textbf{Documentation:} \url{https://github.com/sigoden/aichat/wiki} \\
+\textbf{Version:} 0.30.0 \quad \textbf{License:} MIT / Apache-2.0
+
+\vspace{0.5cm}
+
+\noindent
+AIChat is a powerful and flexible LLM CLI tool designed to provide developers and advanced users with efficient and convenient AI interaction experiences.
+
+\subsection{Core Features}
+
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Multi-Provider Integration:} Support for 20+ LLM providers including OpenAI, Claude, Gemini, Ollama
+
+    \textit{Usage:}
+    \begin{verbatim}
+    # Switch between different providers
+    aichat -m gpt-4o "Explain quantum computing"
+    aichat -m claude:claude-3-5-sonnet "Review my code"
+    aichat -m ollama:llama3.1 "Local model query"
+    \end{verbatim}
+
+    \item \textbf{Flexible Working Modes:} Three distinct modes - CMD, REPL, and Server
+
+    \textit{Usage:}
+    \begin{verbatim}
+    # CMD mode - quick one-shot queries
+    aichat "What is Rust ownership?"
+
+    # REPL mode - interactive conversations
+    aichat
+    > .help
+    > .model gpt-4o
+
+    # Server mode - API endpoints
+    aichat --serve
+    # Access at http://localhost:8000/playground
+    \end{verbatim}
+
+    \item \textbf{Shell Assistant:} Natural language to shell command conversion
+
+    \textit{Usage:}
+    \begin{verbatim}
+    # Generate command without execution
+    aichat -c "Find all Python files modified today"
+
+    # Generate and execute command
+    aichat -e "List top 5 largest files in current directory"
+
+    # Complex operations
+    aichat -e "Create backup of all .js files"
+    \end{verbatim}
+
+    \item \textbf{Rich Input Methods:} Support for files, directories, URLs, STDIN, and more
+
+    \textit{Usage:}
+    \begin{verbatim}
+    # Single file
+    aichat -f main.py "Explain this code"
+
+    # Multiple files
+    aichat -f src/*.rs "Find potential bugs"
+
+    # Directory
+    aichat -f ./docs/ "Summarize documentation"
+
+    # URL
+    aichat -f https://example.com "Summarize this page"
+
+    # STDIN pipe
+    cat error.log | aichat "Analyze these errors"
+
+    # Combined inputs
+    aichat -f config.yaml -f main.py "Check configuration"
+    \end{verbatim}
+
+    \item \textbf{Session Management:} Complete conversation context preservation and management
+
+    \textit{Usage:}
+    \begin{verbatim}
+    # Start a new session
+    aichat -s my-project "Let's design an API"
+
+    # Continue existing session
+    aichat -s my-project "Continue from yesterday"
+
+    # List all sessions
+    aichat --list-sessions
+
+    # In REPL mode
+    > .session my-project
+    > .info session
+    > .save session
+    > .compress session
+    \end{verbatim}
+
+    \item \textbf{RAG Support:} Retrieval-Augmented Generation with external documents
+
+    \textit{Usage:}
+    \begin{verbatim}
+    # Create RAG with documents
+    aichat --rag project-docs
+    > .rag add /path/to/docs/
+    > .rag add README.md
+
+    # Query your documents
+    aichat --rag project-docs "How to deploy?"
+
+    # Rebuild after document changes
+    aichat --rag project-docs --rebuild-rag
+
+    # Configure RAG settings
+    # In config.yaml:
+    # rag_embedding_model: openai:text-embedding-3-small
+    # rag_top_k: 5
+    \end{verbatim}
+
+    \item \textbf{Function Calling:} Tool integration and automation capabilities
+
+    \textit{Usage:}
+    \begin{verbatim}
+    # Enable function calling in config.yaml
+    # function_calling: true
+    # use_tools: 'fs,web'
+
+    # Use with tools
+    aichat "Search for latest Rust news and summarize"
+    aichat "Read the config file and check for errors"
+
+    # Custom tool mapping
+    # mapping_tools:
+    #   fs: 'fs_cat,fs_ls,fs_mkdir,fs_rm,fs_write'
+    #   web: 'web_search,web_fetch'
+    \end{verbatim}
+
+    \item \textbf{AI Agents:} Complex task automation and workflow execution
+
+    \textit{Usage:}
+    \begin{verbatim}
+    # List available agents
+    aichat --list-agents
+
+    # Start an agent
+    aichat -a code-reviewer "Review my code"
+
+    # Agent with variables
+    aichat -a code-reviewer \
+      --agent-variable language rust \
+      -f main.rs "Review this file"
+
+    # Create custom agent
+    # ~/.config/aichat/agents/my-agent/config.yaml
+    # name: my-agent
+    # model: gpt-4o
+    # use_tools: 'fs,web'
+    # instructions: |
+    #   You are a specialized assistant...
+    \end{verbatim}
+\end{itemize}
+
+\subsection{Additional Features}
+
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Role System:} Customize AI behavior with predefined roles
+    \begin{verbatim}
+    aichat -r code "Write a web server"
+    aichat -r translator "Translate: Hello World"
+    \end{verbatim}
+
+    \item \textbf{Macro System:} Combine commands into reusable shortcuts
+    \begin{verbatim}
+    aichat --macro review main.rs
+    aichat --list-macros
+    \end{verbatim}
+
+    \item \textbf{Custom Themes:} Personalize your terminal experience
+    \begin{verbatim}
+    # config.yaml
+    # highlight: true
+    # light_theme: false
+    \end{verbatim}
+\end{itemize}
+
+\subsection{Quick Start}
+
+\begin{verbatim}
+# Installation
+cargo install aichat         # Rust
+brew install aichat          # macOS/Linux
+pacman -S aichat            # Arch Linux
+
+# Configuration
+# Edit ~/.config/aichat/config.yaml
+# Add your API keys:
+# clients:
+#   - type: openai
+#     api_key: sk-xxx
+
+# Basic usage
+aichat "Hello, AIChat!"
+
+# Interactive mode
+aichat
+
+# Get help
+aichat --help
+\end{verbatim}
