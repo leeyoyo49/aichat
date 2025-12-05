@@ -1,5 +1,5 @@
 use super::*;
-use anyhow::{anyhow, Context, Result};
+use anyhow::{anyhow, bail, Context, Result};
 use chrono::Local;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;

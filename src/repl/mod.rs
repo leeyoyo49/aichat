@@ -15,9 +15,10 @@ use crate::config::{
 use crate::render::render_error;
 use crate::utils::{
     abortable_run_with_spinner, create_abort_signal, dimmed_text, set_text, temp_file, AbortSignal,
+    BackupManager,
 };
 
-use anyhow::{bail, Context, Result};
+use anyhow::{anyhow, bail, Context, Result};
 use crossterm::cursor::SetCursorStyle;
 use fancy_regex::Regex;
 use reedline::CursorConfig;
@@ -32,7 +33,7 @@ use std::{env, process};
 
 const MENU_NAME: &str = "completion_menu";
 
-static REPL_COMMANDS: LazyLock<[ReplCommand; 37]> = LazyLock::new(|| {
+static REPL_COMMANDS: LazyLock<[ReplCommand; 38]> = LazyLock::new(|| {
     [
         ReplCommand::new(".help", "Show this help guide", AssertState::pass()),
         ReplCommand::new(".info", "Show system info", AssertState::pass()),
