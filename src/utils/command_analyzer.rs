@@ -53,6 +53,27 @@ pub enum SafetyLevel {
 }
 
 impl CommandAnalysis {
+    /// Returns the more dangerous of two operations
+    fn most_dangerous(op1: CommandOperation, op2: CommandOperation) -> CommandOperation {
+        use CommandOperation::*;
+
+        // Danger ranking (higher = more dangerous)
+        let rank = |op: &CommandOperation| match op {
+            Delete => 5,
+            System => 4,
+            Modify => 3,
+            Move | Write => 2,
+            Execute | Network | Copy | Create => 1,
+            Read | Unknown => 0,
+        };
+
+        if rank(&op1) >= rank(&op2) {
+            op1
+        } else {
+            op2
+        }
+    }
+
     pub fn analyze(command: &str) -> Self {
         let mut analysis = CommandAnalysis {
             command: command.to_string(),
@@ -62,29 +83,49 @@ impl CommandAnalysis {
             safety_level: SafetyLevel::Safe,
         };
 
-        // Parse command to identify operation
-        let parts: Vec<&str> = command.split_whitespace().collect();
-        if parts.is_empty() {
-            return analysis;
+        // Check for pipe commands and analyze all parts
+        let pipe_parts: Vec<&str> = command.split('|').collect();
+        let mut most_dangerous_op = CommandOperation::Unknown;
+
+        for pipe_cmd in pipe_parts {
+            let parts: Vec<&str> = pipe_cmd.trim().split_whitespace().collect();
+            if parts.is_empty() {
+                continue;
+            }
+
+            let cmd_word = parts[0];
+
+            // Identify operation type for this part
+            let op = match cmd_word {
+                "rm" | "rmdir" => CommandOperation::Delete,
+                "mv" | "rename" => CommandOperation::Move,
+                "cp" => CommandOperation::Copy,
+                "touch" | "mkdir" => CommandOperation::Create,
+                "sed" | "awk" if pipe_cmd.contains("-i") => CommandOperation::Modify,
+                "cat" | "less" | "more" | "grep" | "find" | "ls" => CommandOperation::Read,
+                "echo" if pipe_cmd.contains(">") => CommandOperation::Write,
+                "tee" => CommandOperation::Write,
+                "curl" | "wget" | "ssh" | "scp" | "rsync" => CommandOperation::Network,
+                "sudo" | "systemctl" | "service" => CommandOperation::System,
+                "sh" | "bash" | "zsh" | "python" | "node" | "ruby" => CommandOperation::Execute,
+                "xargs" => {
+                    // Special handling for xargs - check what command it's running
+                    if pipe_cmd.contains(" rm ") || pipe_cmd.ends_with(" rm") {
+                        CommandOperation::Delete
+                    } else if pipe_cmd.contains(" mv ") {
+                        CommandOperation::Move
+                    } else {
+                        CommandOperation::Unknown
+                    }
+                }
+                _ => CommandOperation::Unknown,
+            };
+
+            // Keep the most dangerous operation
+            most_dangerous_op = Self::most_dangerous(most_dangerous_op, op);
         }
 
-        let main_cmd = parts[0];
-
-        // Identify operation type
-        analysis.operation = match main_cmd {
-            "rm" | "rmdir" => CommandOperation::Delete,
-            "mv" | "rename" => CommandOperation::Move,
-            "cp" => CommandOperation::Copy,
-            "touch" | "mkdir" => CommandOperation::Create,
-            "sed" | "awk" if command.contains("-i") => CommandOperation::Modify,
-            "cat" | "less" | "more" | "grep" | "find" | "ls" => CommandOperation::Read,
-            "echo" if command.contains(">") => CommandOperation::Write,
-            "tee" => CommandOperation::Write,
-            "curl" | "wget" | "ssh" | "scp" | "rsync" => CommandOperation::Network,
-            "sudo" | "systemctl" | "service" => CommandOperation::System,
-            "sh" | "bash" | "zsh" | "python" | "node" | "ruby" => CommandOperation::Execute,
-            _ => CommandOperation::Unknown,
-        };
+        analysis.operation = most_dangerous_op;
 
         // Extract affected files
         analysis.affected_files = extract_file_paths_from_command(command);
@@ -109,7 +150,7 @@ impl CommandAnalysis {
         }
 
         // Specific warnings
-        if main_cmd == "rm" {
+        if command.contains(" rm ") || command.starts_with("rm ") {
             if command.contains("-rf") || command.contains("-r") {
                 analysis
                     .warnings
@@ -122,7 +163,7 @@ impl CommandAnalysis {
             }
         }
 
-        if main_cmd == "mv" && !analysis.affected_files.is_empty() {
+        if (command.contains(" mv ") || command.starts_with("mv ")) && !analysis.affected_files.is_empty() {
             analysis
                 .warnings
                 .push("💡 Files will be moved/renamed.".to_string());
@@ -207,5 +248,19 @@ mod tests {
     fn test_analyze_sudo_command() {
         let analysis = CommandAnalysis::analyze("sudo rm file.txt");
         assert_eq!(analysis.safety_level, SafetyLevel::Critical);
+    }
+
+    #[test]
+    fn test_analyze_pipe_with_rm() {
+        let analysis = CommandAnalysis::analyze("find . -name 'test.md' | xargs rm");
+        assert_eq!(analysis.operation, CommandOperation::Delete);
+        assert_eq!(analysis.safety_level, SafetyLevel::Dangerous);
+    }
+
+    #[test]
+    fn test_analyze_xargs_rm() {
+        let analysis = CommandAnalysis::analyze("find . -name 'test.md' -print0 | xargs -0 rm -f");
+        assert_eq!(analysis.operation, CommandOperation::Delete);
+        assert_eq!(analysis.safety_level, SafetyLevel::Dangerous);
     }
 }
