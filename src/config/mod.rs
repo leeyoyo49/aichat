@@ -7,7 +7,7 @@ pub mod environments;
 pub use self::agent::{complete_agent_variables, list_agents, Agent, AgentVariables};
 pub use self::input::Input;
 pub use self::role::{
-    Role, RoleLike, CODE_ROLE, CREATE_TITLE_ROLE, EXPLAIN_SHELL_ROLE, SHELL_ROLE,
+    Role, RoleLike, CODE_ROLE, CREATE_TITLE_ROLE, SHELL_ROLE,
 };
 pub use environments::EnvProfile;
 use self::session::Session;

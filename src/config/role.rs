@@ -10,6 +10,7 @@ use serde_json::Value;
 use std::sync::LazyLock;
 
 pub const SHELL_ROLE: &str = "%shell%";
+#[allow(dead_code)]
 pub const EXPLAIN_SHELL_ROLE: &str = "%explain-shell%";
 pub const CODE_ROLE: &str = "%code%";
 pub const CREATE_TITLE_ROLE: &str = "%create-title%";

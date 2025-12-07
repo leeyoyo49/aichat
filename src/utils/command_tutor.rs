@@ -1,4 +1,3 @@
-use super::*;
 use crate::config::{EnvProfile, GlobalConfig};
 use anyhow::Result;
 use std::collections::HashMap;
@@ -298,7 +297,7 @@ impl CommandTutorial {
 
         // Structure breakdown
         output.push_str("Structure Breakdown:\n");
-        for (i, part) in self.structure.iter().enumerate() {
+        for (_i, part) in self.structure.iter().enumerate() {
             let icon = match part.part_type {
                 PartType::Command => "▶️",
                 PartType::Flag => "🚩",
@@ -344,7 +343,7 @@ impl CommandTutorial {
 }
 
 /// Show command tutorial
-pub fn show_command_tutorial(command: &str, config: &GlobalConfig) -> Result<()> {
+pub fn show_command_tutorial(command: &str, _config: &GlobalConfig) -> Result<()> {
     let env = EnvProfile::detect();
     let tutorial = CommandTutorial::analyze(command, &env);
     println!("{}", tutorial.display());

@@ -1,5 +1,4 @@
-use super::*;
-use anyhow::{anyhow, bail, Context, Result};
+use anyhow::{anyhow, bail, Result};
 use chrono::Local;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -154,7 +153,7 @@ impl BackupManager {
     }
 
     pub fn delete_backup(&self, backup_id: &str) -> Result<()> {
-        let entry = self.get_backup_entry(backup_id)?;
+        let _entry = self.get_backup_entry(backup_id)?;
 
         // Delete backup directory
         let backup_subdir = self.backup_dir.join(backup_id);
